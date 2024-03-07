@@ -40,7 +40,6 @@ jobs:
           
           echo "::set-output name=dev_minor::${dev_minor}"
 
-
       - name: Determine Version
         id: determine_version
         run: |
@@ -50,10 +49,13 @@ jobs:
           if [[ $base_branch == 'qa' ]]; then
             if [[ $branch_name == 'dev' ]]; then
               if [[ ${{ github.event.action }} == 'closed' && ${{ github.event.pull_request.merged }} == 'true' ]]; then
+                dev_version_json=$(git show origin/dev:package.json)
+                dev_version=$(echo $dev_version_json | jq -r .version)
+                dev_minor=$(echo $dev_version | cut -d. -f2)
+                echo "Versión minor dev: $dev_minor"
+
                 qa_version=$(git show refs/heads/qa:package.json | jq -r .version)
                 qa_minor=$(echo $qa_version | cut -d. -f2)
-
-                echo "Versión minor dev: $dev_minor"
                 echo "Versión minor qa: $qa_minor"
 
                 if [[ $dev_minor == $qa_minor ]]; then
@@ -61,7 +63,6 @@ jobs:
                 else
                   npm --no-git-tag-version version prerelease --preid=beta
                 fi
-              fi
             elif [[ $branch_name == *fix/* ]]; then
               if [[ ${{ github.event.action }} == 'closed' && ${{ github.event.pull_request.merged }} == 'true' ]]; then
                 npm version prepatch --preid=beta
