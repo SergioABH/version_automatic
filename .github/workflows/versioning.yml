@@ -30,10 +30,11 @@ jobs:
 
       - name: Get Dev Version and Minor
         run: |
-          dev_version_json=$(git show refs/heads/dev:package.json)
+          dev_version_json=$(git show origin/dev:package.json)
           dev_version=$(echo $dev_version_json | jq -r .version)
           dev_minor=$(echo $dev_version | cut -d. -f2)
           echo "::set-output name=dev_minor::${dev_minor}"
+
 
       - name: Determine Version
         id: determine_version
