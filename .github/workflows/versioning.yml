@@ -51,6 +51,7 @@ jobs:
                 else
                   npm --no-git-tag-version version prerelease --preid=beta
                 fi
+              fi
             elif [[ $branch_name == *fix/* ]]; then
               if [[ ${{ github.event.action }} == 'closed' && ${{ github.event.pull_request.merged }} == 'true' ]]; then
                 npm version prepatch --preid=beta
@@ -96,7 +97,6 @@ jobs:
       - name: Reintegrate Changes
         run: |
           if [[ ${{ github.event.action }} == 'closed' && ${{ github.event.pull_request.merged }} == 'true' && ${{ github.event.pull_request.base.ref }} == 'master' ]]; then
-
             version=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1 master))
             reintegrate_branch="reintegrate/$version"
 
