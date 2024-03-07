@@ -37,15 +37,18 @@ jobs:
           if [[ $base_branch == 'qa' ]]; then
             if [[ $branch_name == 'dev' ]]; then
               if [[ ${{ github.event.action }} == 'closed' && ${{ github.event.pull_request.merged }} == 'true' ]]; then
-                qa_version=$(git show qa:package.json | jq -r .version)
-                dev_version=$(git show dev:package.json | jq -r .version)
-                
-                dev_minor=$(echo $dev_version | cut -d. -f2)
+                qa_version=$(git show refs/heads/qa:package.json | jq -r .version)
+                dev_version=$(git show refs/heads/dev:package.json | jq -r .version)
+
+                dev_minor=""
+                if [ -n "$dev_version" ]; then
+                  dev_minor=$(echo $dev_version | cut -d. -f2)
+                fi
                 qa_minor=$(echo $qa_version | cut -d. -f2)
-                
+
                 echo "Versión minor dev: $dev_minor"
                 echo "Versión minor qa: $qa_minor"
-                
+
                 if [[ $dev_minor == $qa_minor ]]; then
                   npm --no-git-tag-version version preminor --preid=beta
                 else
