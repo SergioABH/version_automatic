@@ -32,13 +32,14 @@ jobs:
         run: |
           dev_version_json=$(git show origin/dev:package.json)
           dev_version=$(echo $dev_version_json | jq -r .version)
-          dev_minor=$(echo $dev_version | jq -r '.version | split(".") | .[1]')
+          dev_minor=$(echo $dev_version | jq -r '. | capture("(?<minor>\\d+)") | .minor')
           
           echo "Dev Version JSON: $dev_version_json"
           echo "Dev Version: $dev_version"
           echo "Dev Minor: $dev_minor"
           
           echo "::set-output name=dev_minor::${dev_minor}"
+
 
       - name: Determine Version
         id: determine_version
