@@ -28,6 +28,12 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
+      - name: Get Dev Version and Minor
+        run: |
+          dev_version_json=$(git show refs/heads/dev:package.json)
+          dev_minor=$(echo $dev_version_json | jq -r .version | cut -d. -f2)
+          echo "::set-output name=dev_minor::${dev_minor}"
+
       - name: Determine Version
         id: determine_version
         run: |
@@ -38,12 +44,6 @@ jobs:
             if [[ $branch_name == 'dev' ]]; then
               if [[ ${{ github.event.action }} == 'closed' && ${{ github.event.pull_request.merged }} == 'true' ]]; then
                 qa_version=$(git show refs/heads/qa:package.json | jq -r .version)
-                dev_version=$(git show refs/heads/dev:package.json | jq -r .version)
-
-                dev_minor=""
-                if [ -n "$dev_version" ]; then
-                  dev_minor=$(echo $dev_version | cut -d. -f2)
-                fi
                 qa_minor=$(echo $qa_version | cut -d. -f2)
 
                 echo "Versión minor dev: $dev_minor"
